@@ -36,27 +36,39 @@ fprintf('Moment xoắn trục I: T1 = %.2f N.mm\n', T1);
 fprintf('Số ca làm việc: %d ca\n', ca);
 fprintf('Góc nghiêng: β = %d°\n', beta_goc);
 
+% Chọn loại đai dựa trên đồ thị/bảng tra cứu
+fprintf('\nLUỰA CHỌN LOẠI ĐAI:\n');
+fprintf('-------------------\n');
+fprintf('Thông số tham khảo:\n');
+fprintf('- Công suất: P1 = %.2f kW\n', P1);
+fprintf('- Tốc độ: n1 = %d vòng/phút\n', n1);
+fprintf('- Điều kiện làm việc: Va đập nhẹ, %d ca/ngày\n', ca);
+fprintf('Tra đồ thị 4.1 hoặc bảng để chọn loại đai phù hợp...\n\n');
+
+% Người dùng nhập loại đai sau khi tra đồ thị/bảng
+fprintf('Các loại đai có sẵn: O, A, B, C, D, E\n');
+loai_dai = input('Nhập loại đai đã chọn (ví dụ: A): ', 's');
+if isempty(loai_dai)
+    loai_dai = 'A'; % Giá trị mặc định
+    fprintf('Sử dụng giá trị mặc định: %s\n', loai_dai);
+end
+
+% In kết quả lựa chọn
+fprintf('\nKẾT QUẢ LỰACHỌN:\n');
+fprintf('→ Loại đai: Đai thang thường loại %s\n', loai_dai);
+fprintf('→ Vật liệu: Đai vải cao su (phù hợp với điều kiện va đập nhẹ)\n');
+
 %% TÍNH TOÁN TỶ SỐ TRUYỀN VÀ CÁC THÔNG SỐ CƠ BẢN
 fprintf('\n==========================================================\n');
 fprintf('  TÍNH TOÁN CÁC THÔNG SỐ CƠ BẢN\n');
 fprintf('==========================================================\n\n');
-
-% 1.1: Chọn loại đai
-P1 = 1.2; % kW - Công suất trên trục chủ động
-if(P1 < 2 && n1 == 720)
-    fprintf('1.1: Chọn loại đai: Đai thang thường loại A\n');
-    fprintf('Loại đai thang thường loại A phù hợp với công suất P1 < 2 kW và n1 < 1000 vòng/phút\n');
-else
-    fprintf('Loại đai không phù hợp với công suất và tốc độ trục I\n');
-end
-% Điều kiện va đập nhẹ nên ta chọn vật liệu đai là đai vải cao su.
-%1.2: Xác định đường kính đai
+%1.1: Xác định đường kính đai
 %Chọn đường kính bánh đai nhỏ:
 % Theo công thức: d1 = (1100:1300) * (P1/n1)^(1/3)
 k = 1100:1300;
 d1_min = k(1) * (P1/n1)^(1/3);
 d1_max = k(end) * (P1/n1)^(1/3);
-fprintf('1.2: Đường kính bánh đai nhỏ d1 nằm trong khoảng: %.2f mm đến %.2f mm\n', d1_min, d1_max);
+fprintf('1.1: Đường kính bánh đai nhỏ d1 nằm trong khoảng: %.2f mm đến %.2f mm\n', d1_min, d1_max);
 
 % Dãy tiêu chuẩn đường kính bánh đai (mm)
 d1_standard = [63, 71, 80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250, 1400, 1600, 1800, 2000, 2240, 2500, 2800, 3150, 3550, 4000];
@@ -109,19 +121,19 @@ end
 %Tính khoảng cách trục
 %Kiểm tra bảng 4.14
 a = d2_chon * 1.2; % mm
-fprintf('Khoảng cách trục a = %.2f mm\n', a);
+fprintf('1.2: Khoảng cách trục a = %.2f mm\n', a);
 %Kiểm tra điều kiện của a
 if 0.55 * (d1_chon + d2_chon) + 6 <= a && a <= 2 * (d1_chon + d2_chon)
     fprintf('Khoảng cách trục a thỏa mãn điều kiện\n');
 else
     fprintf('Khoảng cách trục a không thỏa mãn điều kiện\n');
 end
-%1.4: Tính chiều dài đai
+%1.3: Tính chiều dài đai
 %Chiều dài đai L:
 L = 2 * a + (pi/2) * (d1_chon + d2_chon) + ((d2_chon - d1_chon)^2) / (4 * a); % mm
 fprintf('Chiều dài đai L = %.2f mm\n', L);
 %Chọn chiều dài đai theo dãy tiêu chuẩn
-L_standard = [1000, 1120, 1250, 1400, 1600, 1800, 2000, 2240, 2500, 2800, 3150, 3550, 4000, 4500, 5000, 5600, 6300, 7100, 8000, 9000, 10000]; % mm
+L_standard = [400, 425, 450, 475, 500, 530, 560, 600, 630, 670, 710, 750, 800, 850, 900, 950, 1000, 1060, 1120, 1180, 1250, 1320, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2120, 2240, 2360, 2500, 2650, 2800, 3000, 3150, 3350, 3550, 3750, 4000, 4250, 4500, 5000, 5600, 6300, 7100, 8000, 9000, 10000, 11200, 12500, 14000]; % mm
 idx = find(L_standard >= L, 1, 'first');
 if ~isempty(idx)
     L_chon = L_standard(idx);
@@ -131,6 +143,8 @@ else
 end
 %Tính số vòng chạy i của đai trong 1s
 i = (v * 1000) / L_chon; % vòng/s
+% Làm tròn i đến 2 chữ số thập phân
+i = floor(i*100)/100;
 fprintf('Số vòng chạy i của đai trong 1s: i = %.4f vòng/s\n', i);
 %Tính khoảng cách trục a theo chiều dài đai tiêu chuẩn L = 2000
 lamda = L_chon - (pi/2) * (d1_chon + d2_chon);
@@ -149,7 +163,7 @@ if alpha >= 120
 else
     fprintf('Góc ôm không thỏa mãn yêu cầu \n');
 end
-%1.5: Xác định số đai
+%1.4: Xác định số đai
 % Tra hệ số góc ôm đai C_alpha theo bảng 4.15
 alpha_table = [180 170 160 150 140 130 120 110 100 90 80 70];
 C_alpha_table = [1 0.98 0.95 0.92 0.89 0.86 0.82 0.78 0.73 0.68 0.62 0.56];
@@ -168,11 +182,14 @@ else
 end
 fprintf('Hệ số góc ôm đai C_alpha = %.3f\n', C_alpha);
 %Xác định hệ số kể đến ảnh hưởng của chiều dài đai C_l theo bảng 4.16
-%Xác định hệ số L/l0; l0 = 1700 < đai thang thường loại A>
-l0 = 1700; % mm
-
+%Xác định hệ số L/l0; l0 = 1700 < đai thang thường loại A> hoặchc l0=1320 (loại O)
+if strcmp(loai_dai,'O')
+    l0 = 1320;
+elseif strcmp(loai_dai,'A')
+    l0 = 1700;
+end
 L_l0 = L_chon/l0;
-fprintf('Tỉ số L/l0 = %.2f\n', L_l0);
+fprintf('Tỉ số L/l0 = %.2f (l0 = %d mm)\n', L_l0, l0);
 
 % Tra hệ số Cl theo bảng 4.16
 L_l0_table = [0.5 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 2.4];
@@ -204,14 +221,24 @@ fprintf('Hệ số tỉ số truyền Cu = %.3f\n', Cu);
 %Tính hệ số kể đến ảnh hưởng của sự phân bố không đều tải trọng cho các đai:
 
 % Tra bảng 4.19 để xác định P0
-% Dữ liệu bảng 4.19 cho l0 = 1700
-d1_bang = [112 125 140 160 180];
+
+% Dữ liệu bảng 4.19 cho cả đai loại O (l0=1320) và A (l0=1700)
 v_bang = [3 5 10 15 20 25];
-P0_bang = [0.70 1.08 1.85 2.40 2.73 2.85;  % 112
-    0.78 1.17 2.00 2.75 3.08 3.26;  % 125
-    0.80 1.25 2.20 2.92 3.44 3.75;  % 140
-    0.84 1.32 2.34 3.14 3.78 4.09;  % 160
-    0.88 1.38 2.47 3.37 4.06 4.46]; % 180
+if strcmp(loai_dai,'O')
+    d1_bang = [63 90 112];
+    P0_bang = [0.33 0.49 0.83 1.04 1.14 NaN;   % 63
+        0.46 0.64 1.17 1.54 1.80 1.88;  % 90
+        0.48 0.75 1.33 1.78 2.12 2.30]; % 112
+    l0_bang = 1320;
+else % Loại A hoặc khác
+    d1_bang = [112 125 140 160 180];
+    P0_bang = [0.70 1.08 1.85 2.40 2.73 2.85;  % 112
+        0.78 1.17 2.00 2.75 3.08 3.26;  % 125
+        0.80 1.25 2.20 2.92 3.44 3.75;  % 140
+        0.84 1.32 2.34 3.14 3.78 4.09;  % 160
+        0.88 1.38 2.47 3.37 4.06 4.46]; % 180
+    l0_bang = 1700;
+end
 
 % Tìm chỉ số d1 gần nhất nhỏ hơn hoặc bằng d1_chon
 idx_d1 = find(d1_bang <= d1_chon, 1, 'last');
@@ -220,30 +247,46 @@ if isempty(idx_d1)
 end
 
 % Tìm chỉ số vận tốc gần nhất với v
-[~, idx_v] = min(abs(v_bang - v));
+
+% Chọn cột vận tốc phù hợp: nếu v < 5 thì lấy cột 3, 5 <= v < 10 thì lấy cột 5, 10 <= v < 15 thì lấy cột 10, ...
+if v < 5
+    idx_v = 1; % cột 3
+elseif v < 10
+    idx_v = 2; % cột 5
+elseif v < 15
+    idx_v = 3; % cột 10
+elseif v < 20
+    idx_v = 4; % cột 15
+elseif v < 25
+    idx_v = 5; % cột 20
+else
+    idx_v = 6; % cột 25
+end
 
 P0 = P0_bang(idx_d1, idx_v);
-fprintf('Công suất cho phép P0 (tra bảng 4.19, l0=1700, d1=%d, v=%.2f m/s) = %.2f kW\n', d1_bang(idx_d1), v_bang(idx_v), P0);
+fprintf('Công suất cho phép P0 (tra bảng 4.19, l0=%d, d1=%d, lấy tại v=%.0f m/s) = %.2f kW\n', l0_bang, d1_bang(idx_d1), v_bang(idx_v), P0);
 
 Z_phay = P1 / P0;
 fprintf('Z_phay = P1/P0 = %.2f\n', Z_phay);
 % Tra hệ số Cz theo bảng 4.18
 z_table = [1 2 4 6];
 Cz_table = [1 0.95 0.9 0.85];
-
-if Z_phay <= z_table(1)
-    Cz = Cz_table(1);
-elseif Z_phay <= 3
-    Cz = Cz_table(2);
-elseif Z_phay <= 5
-    Cz = Cz_table(3);
+z_rounded = round(Z_phay);
+if z_rounded == 1
+    Cz = 1;
+elseif z_rounded == 2 || z_rounded == 3
+    Cz = 0.95;
+elseif z_rounded == 4 || z_rounded == 5
+    Cz = 0.9;
+elseif z_rounded == 6
+    Cz = 0.85;
 else
-    Cz = Cz_table(4);
+    Cz = 1; % Giá trị mặc định nếu ngoài bảng
 end
 fprintf('Hệ số số đai Cz (tra bảng 4.18, lấy chuẩn) = %.2f\n', Cz);
 
 % Chọn loại tải trọng: 1-tĩnh, 2-dao động nhẹ, 3-dao động mạnh, 4-va đập rất mạnh
-loai_tai = 2; % ví dụ: dao động nhẹ
+loai_tai = 2; % Cái này cần điều chỉnh phù hợp với đề bài
 nhom_dong_co = 1; % 1: Nhóm I, 2: Nhóm II
 
 % Bảng Kd gốc
@@ -266,20 +309,20 @@ fprintf('Hệ số tải trọng động Kd (tra bảng 4.7) = %.2f\n', Kd);
 z = P1 * Kd / (P0 * C_alpha * Cl * Cu * Cz);
 z_round = ceil(z); % Làm tròn lên số nguyên
 fprintf('Số đai cần thiết z = %.2f, làm tròn lên z = %d đai\n', z, z_round);
-%1.6: Xác định lực căng ban đầu và lực tác dụng lên trục
+%1.5: Xác định lực căng ban đầu và lực tác dụng lên trục
 
-% Chọn ký hiệu tiết diện đai: 'O', 'A', 'B', 'YO', 'YA', 'YB'
-ky_hieu_dai = 'A';
+% Chọn ký hiệu tiết diện đai dựa trên lựa chọn của người dùng
+ky_hieu_dai = loai_dai;
 
 
 % Bảng tra t, e, h0, qm
 ky_hieu_bang = {'O', 'A', 'Б', 'B', 'YO', 'YA', 'УБ', 'УВ'};
-t_bang = [10, 15, 25.5, 10, 15, 26, NaN, NaN]; % Cập nhật nếu có số liệu
-e_bang = [8, 10, 17, 8, 10, 17, NaN, NaN];     % Cập nhật nếu có số liệu
-h0_bang = [2.5, 3.3, 5.7, 2.5, 3, 5, NaN, NaN];% Cập nhật nếu có số liệu
+t_bang = [12, 15, 19,25.5, 12, 15, 19, 26];
+e_bang = [8, 10, 12.5, 17, 8, 10, 12.5, 17];
+h0_bang = [2.5, 3.3, 4.2, 5.7, 2.5, 3, 4, 5];
 qm_bang = [0.061, 0.105, 0.178, 0.300, 0.069, 0.118, 0.196, 0.363];
 
-idx_dai = find(strcmp(ky_hieu_bang, ky_hieu_dai));
+idx_dai = find(strcmp(ky_hieu_bang, loai_dai));
 if isempty(idx_dai)
     error('Không tìm thấy ký hiệu tiết diện đai!');
 end
@@ -289,7 +332,7 @@ e = e_bang(idx_dai);
 h0 = h0_bang(idx_dai);
 qm = qm_bang(idx_dai);
 
-fprintf('Với đai %s: t = %.1f mm, e = %.1f mm, h0 = %.1f mm, qm = %.3f kg/m\n', ky_hieu_dai, t, e, h0, qm);
+fprintf('Với đai %s: t = %.1f mm, e = %.1f mm, h0 = %.1f mm, qm = %.3f kg/m\n', loai_dai, t, e, h0, qm);
 
 %Chiều rộng bánh đai
 B = (z_round - 1)*t + 2 * e;
@@ -302,7 +345,7 @@ d_alpha_standard = [80, 90, 100, 112, 125, 140, 160, 180, 200, 224, 250, 280, 31
 [~, idx] = min(abs(d_alpha_standard - d_alpha));
 d_alpha_chon = d_alpha_standard(idx);
 fprintf('Chọn đường kính ngoài bánh đai tiêu chuẩn gần nhất: dα = %d mm\n', d_alpha_chon);
-%1.7: Tính lực tác dụng lên trục
+%1.6: Tính lực tác dụng lên trục
 %Lực căng do lực li tâm sinh ra
 Fv = qm * v^2;
 fprintf('Lực căng do lực li tâm sinh ra Fv = %.2f N\n', Fv);
