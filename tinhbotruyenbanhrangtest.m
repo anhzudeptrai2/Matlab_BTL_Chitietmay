@@ -1,4 +1,3 @@
-
 % ==================================================================
 % BÀI TẬP LỚN CHI TIẾT MÁY - BỘ TRUYỀN BÁNH RĂNG
 % MÔN: CHI TIẾT MÁY
@@ -493,3 +492,170 @@ if ratio_sigma_H <= 10
 else
     fprintf('  Không đạt yêu cầu: ratio_sigma_H = %.2f%% > 10%%. Cần tăng kích thước hoặc thay đổi thông số thiết kế.\n', ratio_sigma_H);
 end
+%% 2.6.2: Kiểm nghiệm về độ bền uốn
+fprintf('\n2.6.2: Kiểm nghiệm về độ bền uốn\n');
+%% 2.6.2a: Tính hệ số phân bố đều tải trọng giữa các răng khi tính về độ uốn (K_Falpha)
+fprintf('\n2.6.2a: Tính hệ số phân bố đều tải trọng giữa các răng K_Falpha theo bảng 6.14\n');
+
+% Tạo bảng tra K_Falpha theo bảng 6.14
+% Vận tốc vòng (m/s)
+v_bang = [2.5, 5, 10, 15, 20, 25];
+
+% Cấp chính xác và giá trị K_Falpha tương ứng
+% Cấp 6
+K_Falpha_cap6 = [1.05, 1.07, 1.10, 1.13, 1.17, 1.20];
+% Cấp 7
+K_Falpha_cap7 = [1.12, 1.16, 1.22, 1.25, 1.35, NaN];
+% Cấp 8
+K_Falpha_cap8 = [1.22, 1.27, 1.37, 1.45, NaN, NaN];
+% Cấp 9
+K_Falpha_cap9 = [1.37, 1.40, NaN, NaN, NaN, NaN];
+
+% Chọn cấp chính xác (giả sử cấp 9 như đã chọn ở trên)
+cap_chinh_xac = input('Nhập cấp chính xác (6, 7, 8, 9, Enter để mặc định 9): ');
+if isempty(cap_chinh_xac) || ~ismember(cap_chinh_xac, [6 7 8 9])
+    cap_chinh_xac = 9;
+    fprintf('  Giá trị không hợp lệ, tự động chọn cấp chính xác = 9\n');
+end
+fprintf('  Chọn cấp chính xác = %d\n', cap_chinh_xac);
+fprintf('  Vận tốc vòng v = %.3f m/s\n', v);
+
+% Chọn bảng K_Falpha theo cấp chính xác
+switch cap_chinh_xac
+    case 6
+        K_Falpha_table = K_Falpha_cap6;
+        fprintf('  Sử dụng bảng K_Falpha cho cấp 6\n');
+    case 7
+        K_Falpha_table = K_Falpha_cap7;
+        fprintf('  Sử dụng bảng K_Falpha cho cấp 7\n');
+    case 8
+        K_Falpha_table = K_Falpha_cap8;
+        fprintf('  Sử dụng bảng K_Falpha cho cấp 8\n');
+    case 9
+        K_Falpha_table = K_Falpha_cap9;
+        fprintf('  Sử dụng bảng K_Falpha cho cấp 9\n');
+    otherwise
+        K_Falpha_table = K_Falpha_cap9;
+        fprintf('  Cấp không hợp lệ, mặc định sử dụng cấp 9\n');
+end
+
+% Tính K_Falpha bằng nội suy tuyến tính
+if v <= v_bang(1)
+    K_Falpha = K_Falpha_table(1);
+    fprintf('  Vì v = %.3f <= %.1f m/s nên K_Falpha = %.3f\n', v, v_bang(1), K_Falpha);
+elseif v >= v_bang(end)
+    % Tìm giá trị cuối cùng không phải NaN
+    valid_indices = ~isnan(K_Falpha_table);
+    if any(valid_indices)
+        last_valid_idx = find(valid_indices, 1, 'last');
+        K_Falpha = K_Falpha_table(last_valid_idx);
+        fprintf('  Vì v = %.3f >= %.1f m/s nên K_Falpha = %.3f (giá trị cuối trong bảng)\n', v, v_bang(last_valid_idx), K_Falpha);
+    else
+        K_Falpha = 1.2; % Giá trị mặc định
+        fprintf('  Không có giá trị hợp lệ trong bảng, sử dụng K_Falpha = %.3f\n', K_Falpha);
+    end
+else
+    % Nội suy tuyến tính
+    % Tìm hai điểm gần nhất để nội suy
+    idx_lower = find(v_bang <= v, 1, 'last');
+    idx_upper = find(v_bang >= v, 1, 'first');
+
+    % Kiểm tra xem có giá trị NaN không
+    if isnan(K_Falpha_table(idx_lower)) || isnan(K_Falpha_table(idx_upper))
+        % Nếu có NaN, tìm giá trị gần nhất không phải NaN
+        valid_indices = ~isnan(K_Falpha_table);
+        [~, closest_idx] = min(abs(v_bang(valid_indices) - v));
+        valid_v_values = v_bang(valid_indices);
+        valid_K_values = K_Falpha_table(valid_indices);
+        K_Falpha = valid_K_values(closest_idx);
+        fprintf('  Do có giá trị NaN trong bảng, chọn giá trị gần nhất: v = %.1f m/s, K_Falpha = %.3f\n', valid_v_values(closest_idx), K_Falpha);
+    else
+        % Nội suy tuyến tính
+        v1 = v_bang(idx_lower);
+        v2 = v_bang(idx_upper);
+        K1 = K_Falpha_table(idx_lower);
+        K2 = K_Falpha_table(idx_upper);
+
+        if idx_lower == idx_upper
+            K_Falpha = K1;
+            fprintf('  Vận tốc v = %.3f m/s trùng với giá trị trong bảng, K_Falpha = %.3f\n', v, K_Falpha);
+        else
+            K_Falpha = K1 + (K2 - K1) * (v - v1) / (v2 - v1);
+            fprintf('  Nội suy tuyến tính giữa v1 = %.1f m/s (K_Falpha = %.3f) và v2 = %.1f m/s (K_Falpha = %.3f)\n', v1, K1, v2, K2);
+            fprintf('  K_Falpha = %.3f + (%.3f - %.3f) * (%.3f - %.1f) / (%.1f - %.1f) = %.3f\n', K1, K2, K1, v, v1, v2, v1, K_Falpha);
+        end
+    end
+end
+
+fprintf('  Kết quả: K_Falpha = %.3f\n', K_Falpha);
+%% 2.6.2b: Tính là hệ số phân bố không đều tải trọng trên chiều rộng vành răng khi tính về độ bền uốn (K_Fbeta)
+fprintf('\n2.6.2b: Tính hệ số phân bố không đều tải trọng trên chiều rộng vành răng K_Fbeta theo bảng 6.7\n');
+
+% --- Công thức tra bảng 6.7 để tính K_Fbeta ---
+% Bảng giá trị psi_bd
+psi_bd_bang = [0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6];
+
+% Bảng giá trị K_Fbeta cho HB1, HB2 <= 350
+K_Fbeta_bang_350 = [
+    1.18 1.38 1.61 1.95 NaN NaN NaN NaN; % sơ đồ 1
+    1.1 1.21 1.39 1.58 NaN NaN NaN NaN; % sơ đồ 2
+    1.05 1.11 1.17 1.24 1.32 1.41 1.5 1.6; % sơ đồ 3
+    1.03 1.06 1.12 1.17 1.23 1.30 1.38 1.45; % sơ đồ 4
+    1.02 1.05 1.08 1.12 1.16 1.22 1.28 1.37; % sơ đồ 5
+    1.01 1.03 1.05 1.07 1.10 1.14 1.19 1.26; % sơ đồ 6
+    1.00 1.01 1.02 1.03 1.05 1.08 1.12 1.15; % sơ đồ 7
+    ];
+
+% Bảng giá trị K_Fbeta cho HB1, HB2 > 350
+K_Fbeta_bang_400 = [
+    1.31 1.69 NaN NaN NaN NaN NaN NaN; % sơ đồ 1
+    1.20 1.42 1.71 NaN NaN NaN NaN NaN; % sơ đồ 2
+    1.08 1.18 1.30 1.43 1.57 1.72 NaN NaN; % sơ đồ 3
+    1.04 1.06 1.17 1.27 1.39 1.53 1.70 NaN; % sơ đồ 4
+    1.03 1.10 1.12 1.20 1.28 1.41 1.53 NaN; % sơ đồ 5
+    1.02 1.04 1.18 1.14 1.20 1.30 1.40 NaN; % sơ đồ 6
+    1.00 1.01 1.02 1.03 1.05 1.08 1.12 1.15; % sơ đồ 7
+    ];
+
+% Chọn bảng theo HB1, HB2
+if HB1 <= 350 && HB2 <= 350
+    K_Fbeta_bang = K_Fbeta_bang_350;
+    fprintf('  Chọn bảng K_Fbeta cho HB1, HB2 <= 350\n');
+else
+    K_Fbeta_bang = K_Fbeta_bang_400;
+    fprintf('  Chọn bảng K_Fbeta cho HB1, HB2 > 350\n');
+end
+
+% Tìm vị trí psi_bd gần nhất trong bảng
+[~, idx_psi] = min(abs(psi_bd_bang - psi_bd_rounded));
+% Kiểm tra sơ đồ truyền động (so_do)
+if so_do < 1 || so_do > 7
+    so_do = 1;
+    fprintf('  Sơ đồ truyền động không hợp lệ, tự động chọn sơ đồ 1\n');
+end
+
+K_Fbeta = K_Fbeta_bang(so_do, idx_psi);
+fprintf('  K_Fbeta tra bảng 6.7 với psi_bd = %.2f, sơ đồ %d: K_Fbeta = %.3f\n', psi_bd_rounded, so_do, K_Fbeta);
+%% 2.6.2c: Tính hệ số kể đến tải trọng động xuất hiện trong vùng ăn khớp khi tính về uốn (K_Fv)
+% Tra bảng 6.15 cho bánh răng nghiêng
+if HB1 <= 350 && HB2 <= 350
+    delta_F = 0.006;
+    fprintf('  delta_F tra bảng 6.15 (bánh răng nghiêng, HB1 <= 350, HB2 <= 350): delta_F = %.3f\n', delta_F);
+else
+    delta_F = 0.006;
+    fprintf('  delta_F tra bảng 6.15 (bánh răng nghiêng, HB1 > 350 hoặc HB2 > 350): delta_F = %.3f\n', delta_F);
+end
+vF = delta_F * g0 * v * sqrt(a_w_rounded / u);
+fprintf('  vF = delta_F * g0 * sqrt(a_w / u) = %.3f * %.0f * sqrt(%d / %.2f) = %.3f\n', delta_F, g0, a_w_rounded, u, vF);
+
+% Tính hệ số kể đến tải trọng động xuất hiện trong vùng ăn khớp khi tính về uốn (K_Fv)
+K_Fv = 1 + vF * b_omega * dw1 / (2 * T1 * K_Hbeta * K_Halpha);
+fprintf('  K_Fv = 1 + vF * b_omega * dw1 / (2 * T1 * K_Hbeta * K_Halpha) = 1 + %.3f * %.2f * %.2f / (2 * %.1f * %.2f * %.2f) = %.3f\n', vF, b_omega, dw1, T1, K_Hbeta, K_Halpha, K_Fv);
+%% 2.6.2d: Tính hệ số ảnh hướng đến sự trùng khớp của răng (Y_epsilon)
+% Tính hệ số ảnh hưởng đến sự trùng khớp của răng (Y_epsilon)
+Y_epsilon = 1 / epsilon_alpha;
+fprintf('  Y_epsilon = 1 / epsilon_alpha = 1 / %.3f = %.3f\n', epsilon_alpha, Y_epsilon);
+%% 2.6.2e: Tính hệ số kể đến độ nghiêng của răng (Y_beta)
+% Tính hệ số kể đến độ nghiêng của răng (Y_beta)
+Y_beta = 1 - beta_b / 140;
+fprintf('  Y_beta = 1 - beta_b / 140 = 1 - %.3f / 140 = %.3f\\n', beta_b, Y_beta);
