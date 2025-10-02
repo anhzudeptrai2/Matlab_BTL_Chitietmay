@@ -190,9 +190,9 @@ Y_R = 1; Y_S = 1; K_xF = 1;
 sigma_H1 = sigma_Hlim1 / S_H1 * Z_R * Z_v * K_xH * K_HL1;
 fprintf('  sigma_H1 (ứng suất tiếp xúc cho phép bánh chủ động) = %.2f MPa\n', sigma_H1);
 
-% Tính sigma_F1 (ứng suất uốn cho phép bánh chủ động)
-sigma_F1 = sigma_Flim1 / S_F1 * Y_R * Y_S * K_xF * K_FL1;
-fprintf('  sigma_F1 (ứng suất uốn cho phép bánh chủ động) = %.2f MPa\n', sigma_F1);
+% Tính sigma_F1sb (ứng suất uốn cho phép bánh chủ động)
+sigma_F1sb = sigma_Flim1 / S_F1 * Y_R * Y_S * K_xF * K_FL1;
+fprintf('  sigma_F1sb (ứng suất uốn cho phép bánh chủ động) = %.2f MPa\n', sigma_F1sb);
 
 %% Ứng suất tiếp xúc và ứng suất uốn của bánh bị động
 fprintf('\nỨng suất tiếp xúc của bánh bị động:\n');
@@ -202,15 +202,15 @@ sigma_H2 = sigma_Hlim2 / S_H2 * Z_R * Z_v * K_xH * K_HL2;
 fprintf('  sigma_H2 (ứng suất tiếp xúc cho phép bánh bị động) = %.2f MPa\n', sigma_H2);
 
 % Tính sigma_F2 (ứng suất uốn cho phép bánh bị động)
-sigma_F2 = sigma_Flim2 / S_F2 * Y_R * Y_S * K_xF * K_FL2;
-fprintf('  sigma_F2 (ứng suất uốn cho phép bánh bị động) = %.2f MPa\n', sigma_F2);
+sigma_F2sb = sigma_Flim2 / S_F2 * Y_R * Y_S * K_xF * K_FL2;
+fprintf('  sigma_F2sb (ứng suất uốn cho phép bánh bị động) = %.2f MPa\n', sigma_F2sb);
 
 %% Ứng suất tiếp xúc cho phép của  bộ truyền bánh răng trụ răng nghiêng
 sigma_Hsb = (sigma_H1 + sigma_H2) / 2;
 fprintf('\nỨng suất tiếp xúc cho phép của bộ truyền bánh răng trụ răng nghiêng: sigma_Hsb = (%.2f + %.2f) / 2 = %.2f MPa\n', sigma_H1, sigma_H2, sigma_Hsb);
 %% Ứng suất uốn cho phép của  bộ truyền bánh răng trụ răng nghiêng
-sigma_Hfb = (sigma_F1 + sigma_F2) / 2;
-fprintf('Ứng suất uốn cho phép của bộ truyền bánh răng trụ răng nghiêng: sigma_Hfb = (%.2f + %.2f) / 2 = %.2f MPa\n', sigma_F1, sigma_F2, sigma_Hfb);
+sigma_Ffb = (sigma_F1sb + sigma_F2sb) / 2;
+fprintf('Ứng suất uốn cho phép của bộ truyền bánh răng trụ răng nghiêng: sigma_Ffb = (%.2f + %.2f) / 2 = %.2f MPa\n', sigma_F1sb, sigma_F2sb, sigma_Ffb);
 %% 2.3: Xác định sơ bộ khoảng cách trục
 
 %% Xác định hệ số phụ thuộc vật liệu làm răng
@@ -414,11 +414,11 @@ fprintf('  Hệ số xét đến ảnh hưởng của của kích thước bánh
 sigma_H_allow = sigma_Hsb * Z_R * Z_v * K_xH;
 fprintf('\n- Ứng suất tiếp xúc cho phép sigma_H_allow = sigma_Hsb * Z_R * Z_v * K_xH = %.2f * %.2f * %.2f * %.2f = %.2f MPa\n', sigma_Hsb, Z_R, Z_v, K_xH, sigma_H_allow);
 %% 2.5.8: Tính ứng suất uốn cho phép sigma_Fcd_allow (bánh chủ động)
-sigma_Fcd_allow = sigma_F1 * Y_R * Y_S * K_xF;
-fprintf('- Ứng suất uốn cho phép sigma_Fcd_allow = sigma_F1 * Y_R * Y_S * K_xF = %.2f * %.2f * %.3f * %.2f = %.2f MPa\n', sigma_F1, Y_R, Y_S, K_xF, sigma_Fcd_allow);
+sigma_Fcd_allow = sigma_F1sb * Y_R * Y_S * K_xF;
+fprintf('- Ứng suất uốn cho phép sigma_Fcd_allow = sigma_F1sb * Y_R * Y_S * K_xF = %.2f * %.2f * %.3f * %.2f = %.2f MPa\n', sigma_F1sb, Y_R, Y_S, K_xF, sigma_Fcd_allow);
 %% 2.5.9: Tính ứng suất uốn cho phép sigma_Fbd (bánh bị động)
-sigma_Fbd_allow = sigma_F2 * Y_R * Y_S * K_xF;
-fprintf('- Ứng suất uốn cho phép sigma_Fbd_allow = sigma_F2 * Y_R * Y_S * K_xF = %.2f * %.2f * %.3f * %.2f = %.2f MPa\n', sigma_F2, Y_R, Y_S, K_xF, sigma_Fbd_allow);
+sigma_Fbd_allow = sigma_F2sb * Y_R * Y_S * K_xF;
+fprintf('- Ứng suất uốn cho phép sigma_Fbd_allow = sigma_F2sb * Y_R * Y_S * K_xF = %.2f * %.2f * %.3f * %.2f = %.2f MPa\n', sigma_F2sb, Y_R, Y_S, K_xF, sigma_Fbd_allow);
 %% 2.6: Kiểm nghiệm bộ truyền bánh răng
 fprintf('\n2.6: Kiểm nghiệm bộ truyền bánh răng\n');
 %% 2.6.1: Kiểm nghiệm về độ bền tiếp xúc
@@ -658,4 +658,153 @@ fprintf('  Y_epsilon = 1 / epsilon_alpha = 1 / %.3f = %.3f\n', epsilon_alpha, Y_
 %% 2.6.2e: Tính hệ số kể đến độ nghiêng của răng (Y_beta)
 % Tính hệ số kể đến độ nghiêng của răng (Y_beta)
 Y_beta = 1 - beta_b / 140;
-fprintf('  Y_beta = 1 - beta_b / 140 = 1 - %.3f / 140 = %.3f\\n', beta_b, Y_beta);
+fprintf('  Y_beta = 1 - beta_b / 140 = 1 - %.3f / 140 = %.3f\n', beta_b, Y_beta);
+%% 2.6.2f: Tính hệ số dạng răng (Y_F1, Y_F2)
+% Hệ số dạng răng (Y_F1, Y_F2) phụ thuộc vào số dang tương đương Z_v1 và Z_v2
+Z_v1 = z1_rounded / cosd(beta_ankhop)^3;
+fprintf('  Z_v1 = z1 / cos(beta_ankhop)^3 = %d / cos(%.2f)^3 = %.2f\n', z1_rounded, beta_ankhop, Z_v1);
+Z_v2 = z2_rounded / cosd(beta_ankhop)^3;
+fprintf('  Z_v2 = z2 / cos(beta_ankhop)^3 = %d / cos(%.2f)^3 = %.2f\n', z2_rounded, beta_ankhop, Z_v2);
+% Bảng số răng tương đương
+zv_bang = [12 14 16 17 20 22 25 30 40 60 80 100 150];
+% Bảng hệ số dịch chỉnh x
+x_bang = [0.8 0.7 0.5 0.3 0.1 0 -0.1 -0.3 -0.5];  % **Theo kinh nghiệm thường chọn x = 0**
+% Bảng giá trị Y_F (theo bảng 6.18)
+YF_bang = [
+    2.97 3.12 3.46 3.89 NaN  NaN  NaN  NaN  NaN; % z_v = 12
+    3.02 3.13 3.42 3.78 NaN  NaN  NaN  NaN  NaN; % z_v = 14
+    3.05 3.15 3.40 3.72 NaN  NaN  NaN  NaN  NaN; % z_v = 16
+    3.07 3.16 3.40 3.67 4.03 4.26 NaN  NaN  NaN; % z_v = 17
+    3.11 3.19 3.39 3.61 3.89 4.08 4.28 NaN  NaN; % z_v = 20
+    3.13 3.21 3.39 3.59 3.82 4.00 4.20 NaN  NaN; % z_v = 22
+    3.17 3.24 3.39 3.57 3.77 3.90 4.05 4.28 NaN; % z_v = 25
+    3.22 3.28 3.40 3.54 3.70 3.80 3.90 4.14 NaN; % z_v = 30
+    3.29 3.33 3.42 3.53 3.63 3.70 3.77 3.92 4.13; % z_v = 40
+    3.33 3.38 3.44 3.52 3.60 3.65 3.70 3.81 3.96; % z_v = 50
+    3.37 3.41 3.47 3.53 3.59 3.62 3.67 3.74 3.84; % z_v = 60
+    3.43 3.45 3.50 3.54 3.58 3.61 3.62 3.68 3.73; % z_v = 80
+    3.47 3.49 3.52 3.55 3.58 3.60 3.61 3.65 3.68; % z_v = 100
+    NaN  NaN  NaN  NaN  NaN  3.60 3.63 3.63 3.63]; % z_v = 150
+
+% Chọn hệ số dịch chỉnh x cho bánh răng nhỏ và lớn
+x1 = input('Nhập hệ số dịch chỉnh x1 cho bánh răng nhỏ (thường 0 hoặc >0 nếu z1 nhỏ): ');
+if isempty(x1)
+    x1 = 0;
+end
+x2 = input('Nhập hệ số dịch chỉnh x2 cho bánh răng lớn (thường 0): ');
+if isempty(x2)
+    x2 = 0;
+end
+% Tính số răng tương đương cho bánh nhỏ và lớn
+zv1 = round(Z_v1);
+zv2 = round(Z_v2);
+
+% Tìm vị trí zv và x trong bảng
+[~, idx_zv1] = min(abs(zv_bang - zv1));
+[~, idx_x1] = min(abs(x_bang - x1));
+Y_F1 = YF_bang(idx_zv1, idx_x1);
+
+[~, idx_zv2] = min(abs(zv_bang - zv2));
+[~, idx_x2] = min(abs(x_bang - x2));
+Y_F2 = YF_bang(idx_zv2, idx_x2);
+
+
+fprintf('  Hệ số dạng răng Y_F1 (bánh nhỏ, zv1 = %d, x1 = %.2f): Y_F1 = %.2f\n', zv1, x1, Y_F1);
+fprintf('  Hệ số dạng răng Y_F2 (bánh lớn, zv2 = %d, x2 = %.2f): Y_F2 = %.2f\n', zv2, x2, Y_F2);
+%% Kiểm nghiệm độ bền uốn
+fprintf('\n2.6.2g: Kiểm nghiệm độ bền uốn\n');
+% Tính sigma_F1 và sigma_F2 theo công thức
+fprintf('\nTính sigma_F1 và sigma_F2 theo công thức:\n');
+sigma_F1 = (2 * T1 * K_Falpha * K_Fbeta * K_Fv * Y_epsilon * Y_F1 * Y_beta) / (dw1 * b_omega * m_n_chon);
+fprintf('  sigma_F1 = (2*T1*K_Falpha*K_Fbeta*K_Fv*Y_epsilon*Y_F1*Y_beta)/(dw1*b_omega*m) = (2*%.1f*%.3f*%.3f*%.3f*%.3f*%.3f*%.3f)/(%.2f*%.2f*%.2f) = %.2f MPa\n', T1, K_Falpha, K_Fbeta, K_Fv, Y_epsilon, Y_F1, Y_beta, dw1, b_omega, m_n_chon, sigma_F1);
+if exist('Y_F2','var') && exist('Y_F1','var')
+    sigma_F2 = sigma_F1 * Y_F2 / Y_F1;
+    fprintf('  sigma_F2 = sigma_F1 * Y_F2 / Y_F1 = %.2f * %.3f / %.3f = %.2f MPa\n', sigma_F1, Y_F2, Y_F1, sigma_F2);
+else
+    sigma_F2 = NaN;
+    fprintf('  Không đủ thông tin Y_F2 hoặc Y_F1 để tính sigma_F2.\n');
+end
+% Kiểm tra sigma_F1 và sigma_F2 với giá trị cho phép
+if exist('sigma_Fcd_allow','var')
+    if sigma_F1 <= sigma_Fcd_allow
+        fprintf('  sigma_F1 = %.2f MPa ≤ sigma_Fcd_allow = %.2f MPa: Đảm bảo độ bền uốn\n', sigma_F1, sigma_Fcd_allow);
+    else
+        fprintf('  sigma_F1 = %.2f MPa > sigma_Fcd_allow = %.2f MPa: Không đảm bảo độ bền uốn\n', sigma_F1, sigma_Fcd_allow);
+    end
+end
+if exist('sigma_Fbd_allow','var') && ~isnan(sigma_F2)
+    if sigma_F2 <= sigma_Fbd_allow
+        fprintf('  sigma_F2 = %.2f MPa ≤ sigma_Fbd_allow = %.2f MPa: Đảm bảo độ bền uốn\n', sigma_F2, sigma_Fbd_allow);
+    else
+        fprintf('  sigma_F2 = %.2f MPa > sigma_Fbd_allow = %.2f MPa: Không đảm bảo độ bền uốn\n', sigma_F2, sigma_Fbd_allow);
+    end
+end
+%% 2.7: Một số thông số khác của cặp bánh răng
+fprintf('\n2.7: Một số thông số khác của cặp bánh răng\n');
+% =============================
+% TÍNH ĐƯỜNG KÍNH ĐỈNH RĂNG, ĐÁY RĂNG, LỰC VÒNG, LỰC HƯỚNG TÂM, LỰC DỌC TRỤC
+% =============================
+fprintf('\nTÍNH ĐƯỜNG KÍNH ĐỈNH RĂNG, ĐÁY RĂNG, LỰC VÒNG, LỰC HƯỚNG TÂM, LỰC DỌC TRỤC:\n');
+
+% Đường kính vòng chia (d1, d2)
+d1 = dw1; % bánh chủ động
+d2 = dw2; % bánh bị động
+
+%% Đường kính đỉnh răng
+da1 = d1 + 2 * m_n_chon;
+da2 = d2 + 2 * m_n_chon;
+fprintf('  Đường kính đỉnh răng: da1 = d1 + 2*m = %.2f + 2*%.2f = %.2f mm\n', d1, m_n_chon, da1);
+fprintf('  Đường kính đỉnh răng: da2 = d2 + 2*m = %.2f + 2*%.2f = %.2f mm\n', d2, m_n_chon, da2);
+
+%% Đường kính đáy răng
+df1 = d1 - 2.5 * m_n_chon;
+df2 = d2 - 2.5 * m_n_chon;
+fprintf('  Đường kính đáy răng: df1 = d1 - 2.5*m = %.2f - 2.5*%.2f = %.2f mm\n', d1, m_n_chon, df1);
+fprintf('  Đường kính đáy răng: df2 = d2 - 2.5*m = %.2f - 2.5*%.2f = %.2f mm\n', d2, m_n_chon, df2);
+
+%% Lực vòng
+Ft1 = 2 * T1 / dw1;
+Ft2 = Ft1;
+fprintf('  Lực vòng Ft1 = Ft2 = 2*T1/dw1 = 2*%.1f/%.2f = %.2f N\n', T1, dw1, Ft1);
+
+%% Lực hướng tâm
+Fr1 = Ft1 * tand(20) / cosd(beta_ankhop);
+Fr2 = Fr1;
+fprintf('  Lực hướng tâm Fr1 = Fr2 = Ft1 * tan(20) / cos(beta_ankhop) = %.2f * tan(20) / cos(%.2f) = %.2f N\n', Ft1, beta_ankhop, Fr1);
+
+%% Lực dọc trục
+Fa1 = Ft1 * tand(beta_ankhop);
+Fa2 = Fa1;
+fprintf('  Lực dọc trục Fa1 = Fa2 = Ft1 * tan(beta_ankhop) = %.2f * tan(%.2f) = %.2f N\n', Ft1, beta_ankhop, Fa1);
+
+%% 2.8: Tổng kết thông số bộ truyền bánh răng
+fprintf('\n2.8: Tổng kết thông số bộ truyền bánh răng\n');
+% =============================
+% BẢNG THỐNG KÊ THÔNG SỐ BỘ TRUYỀN BÁNH RĂNG
+% =============================
+fprintf('\n==============================================\n');
+fprintf('TỔNG HỢP CÁC THÔNG SỐ BỘ TRUYỀN BÁNH RĂNG\n');
+fprintf('----------------------------------------------\n');
+fprintf('| %-25s | %-10s | %-15s |\n', 'Thông số', 'Kí hiệu', 'Giá trị');
+fprintf('|---------------------------|------------|-----------------|\n');
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Khoảng cách trục chia', 'a', a_w_rounded);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Số răng bánh nhỏ', 'z1', z1_rounded);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Số răng bánh lớn', 'z2', z2_rounded);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính vòng chia nhỏ', 'd1', d1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính vòng chia lớn', 'd2', d2);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính vòng lăn nhỏ', 'dw1', dw1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính vòng lăn lớn', 'dw2', dw2);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính đỉnh răng nhỏ', 'da1', da1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính đỉnh răng lớn', 'da2', da2);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính đáy răng nhỏ', 'df1', df1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính đáy răng lớn', 'df2', df2);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Môđun pháp', 'm', m_n_chon);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Góc profin gốc', 'alpha', alpha);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Góc ăn khớp', 'beta', beta_ankhop);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Chiều rộng vành đai', 'b_omega', b_omega);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Hệ số dịch chỉnh nhỏ', 'x1', x1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Hệ số dịch chỉnh lớn', 'x2', x2);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Lực vòng Ft1', 'Ft1', Ft1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Lực hướng tâm Fr1', 'Fr1', Fr1);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Lực dọc trục Fa1', 'Fa1', Fa1);
+fprintf('----------------------------------------------\n');
