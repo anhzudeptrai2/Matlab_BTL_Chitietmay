@@ -19,19 +19,19 @@ fprintf('=========================================\n\n');
 fprintf('DỮ LIỆU ĐẦU VÀO (từ đề bài):\n');
 
 % Thông số từ bảng
-P1 = 0.658; % kW - Công suất trên trục chủ động
-n1 = 360; % vòng/phút - Số vong quay trên trục chủ động
-T1 = 17455.3; % N.mm - Moment xoắn của trục chủ động
-u = 4.5; % Tỉ số truyền của bộ truyền
-beta_debaicho = 35; % độ - Góc nghiêng của bộ truyền so với phương ngang
+P1 = 1.129; % kW - Công suất trên trục chủ động
+n1 = 257.14; % vòng/phút - Số vong quay trên trục chủ động
+T1 = 41930.3; % N.mm - Moment xoắn của trục chủ động
+u = 3.8; % Tỉ số truyền của bộ truyền
+%%beta_debaicho = 35; % độ - Góc nghiêng của bộ truyền so với phương ngang
 so_ca = 3 ; % Bộ truyền làm việc
-time = 18000; % giờ - Thời gian làm việc của bộ truyền
+time = 21000; % giờ - Thời gian làm việc của bộ truyền
 loai_tai =  1 ; % Tải trọng tĩnh, làm việc êm
 fprintf('- Công suất trên trục chủ động P1 = %.3f kW\n', P1);
 fprintf('- Số vong quay trên trục chủ động n1 = %d vòng/phút\n', n1);
 fprintf('- Moment xoắn của trục chủ động T1 = %.1f N.mm\n', T1);
 fprintf('- Tỉ số truyền của bộ truyền u = %.1f\n', u);
-fprintf('- Góc nghiêng của bộ truyền so với phương ngang beta = %d độ\n', beta_debaicho);
+%%fprintf('- Góc nghiêng của bộ truyền so với phương ngang beta = %d độ\n', beta_debaicho);
 fprintf('- Bộ truyền làm việc với số ca = %d ca\n', so_ca);
 fprintf('- Thời gian làm việc của bộ truyền time = %d giờ\n', time);
 fprintf('- Loại tải: %d (1 - Tải trọng tĩnh, làm việc êm; 2 - Dao động nhẹ; 3 - Dao động manh; 4 - Va đập rất mạnh)\n', loai_tai);
@@ -344,25 +344,29 @@ if delta_u > 4
 else
     fprintf('  Sai lệch tỉ số truyền đạt yêu cầu (< 4%%).\n');
 end
-%% 2.4.3: Xác định góc ăn khớp của răng
-fprintf('\n2.4.3: Xác định góc ăn khớp của răng\n');
-% Tính góc ăn khớp beta_ankhop
-cos_beta_ankhop = m_n_chon * (z1_rounded + z2_rounded) / (2 * a_w_rounded);
-if abs(cos_beta_ankhop) > 1
-    fprintf('\nGiá trị cos(beta_ankhop) không hợp lệ (|cos_beta_ankhop| > 1), kiểm tra lại thông số đầu vào!\n');
-    beta_ankhop = NaN;
+%% 2.4.3: Xác định góc nghiêng  của răng
+fprintf('\n2.4.3: Xác định góc nghiêng của răng\n');
+% Tính góc nghiêng beta
+cos_beta = m_n_chon * (z1_rounded + z2_rounded) / (2 * a_w_rounded);
+if abs(cos_beta) > 1
+    fprintf('\nGiá trị cos(beta) không hợp lệ (|cos_beta| > 1), kiểm tra lại thông số đầu vào!\n');
+    beta = NaN;
 else
-    beta_ankhop = acosd(cos_beta_ankhop);
-    fprintf('\n- Tính góc ăn khớp của răng:\n');
-    fprintf('  cos(beta_ankhop) = m_n * (z1 + z2) / (2 * a_w) = %.2f * (%d + %d) / (2 * %d) = %.4f\n', m_n_chon, z1_rounded, z2_rounded, a_w_rounded, cos_beta_ankhop);
-    fprintf('  beta_ankhop = acosd(cos_beta_ankhop) = acosd(%.4f) = %.2f độ\n', cos_beta_ankhop, beta_ankhop);
-    % Kiểm tra góc ăn khớp hợp lý
-    if beta_ankhop < 8 || beta_ankhop > 20
-        fprintf('  Góc ăn khớp beta_ankhop = %.2f độ không nằm trong khoảng 8÷20 độ (răng nghiêng)!\n', beta_ankhop);
+    beta = acosd(cos_beta);
+    fprintf('\n- Tính góc nghiêng của răng:\n');
+    fprintf('  cos(beta) = m_n * (z1 + z2) / (2 * a_w) = %.2f * (%d + %d) / (2 * %d) = %.4f\n', m_n_chon, z1_rounded, z2_rounded, a_w_rounded, cos_beta);
+    fprintf('  beta = acosd(cos_beta) = acosd(%.4f) = %.2f độ\n', cos_beta, beta);
+    % Kiểm tra góc nghiêng hợp lý
+    if beta < 8 || beta > 20
+        fprintf('  Góc nghiêng beta = %.2f độ không nằm trong khoảng 8÷20 độ (răng nghiêng)!\n', beta);
     else
-        fprintf('  Góc ăn khớp beta_ankhop hợp lý (8÷20 độ với răng nghiêng).\n');
+        fprintf('  Góc nghiêng beta hợp lý (8÷20 độ với răng nghiêng).\n');
     end
 end
+%% 2.4.4: Xác định góc ăn khớp của răng
+fprintf('\n2.4.4: Xác định góc ăn khớp của răng\n');
+
+
 %% 2.5: Xác định ứng suất cho phép
 fprintf('\n2.5: Xác định ứng suất cho phép\n');
 % Ứng suất cho phép tính ở mục 2 chỉ là ứng suất cho phép sơ bộ.
@@ -382,8 +386,8 @@ v = pi * dw1 * n1 / 60000;
 fprintf('\n- Vận tốc vòng của bánh răng:\n');
 fprintf('  v = pi * dw1 * n1 / 60000 = %.2f * %.2f * %d / 60000 = %.3f m/s\n', pi, dw1, n1, v);
 %% Xác định hệ số xét đến độ nhám của mặt răng làm việc (Z_R)
-Z_R = 0.95;
-fprintf('Giả sử bánh răng được gia công và yêu cầu độ nhám bề mặt răng nằm trong khoảng Ra = 0.63 ÷ 1.25 μm\n');
+Z_R = 1.00;
+fprintf('Giả sử bánh răng được gia công và yêu cầu độ nhám bề mặt răng nằm trong khoảng Ra = 1.25 ÷ 2.5 μm\n');
 fprintf('  Z_R = %.2f\n', Z_R);
 %% 2.5.2: Xác định hệ số tốc độ (Z_v)
 fprintf('\n2.5.2: Xác định hệ số tốc độ (Z_v)\n');
@@ -434,12 +438,12 @@ b_omega = psi_ba * a_w_rounded;
 fprintf('  Chiều rộng vành đai b_omega = psi_ba * a_w = %.2f * %d = %.2f mm\n', psi_ba, a_w_rounded, b_omega);
 %% Tính hệ số trùng hợp khớp dọc (epsilon_beta)
 % Tính hệ số trùng hợp khớp dọc epsilon_beta
-epsilon_beta = b_omega * sind(beta_ankhop) / (m_n_chon * pi);
-fprintf('  Hệ số trùng hợp khớp dọc epsilon_beta = b_omega * sin(beta_ankhop) / (m_n * pi) = %.2f * sin(%d) / (%.2f * %.2f) = %.3f\n', b_omega, beta_ankhop, m_n_chon, pi, epsilon_beta);
+epsilon_beta = b_omega * sind(beta) / (m_n_chon * pi);
+fprintf('  Hệ số trùng hợp khớp dọc epsilon_beta = b_omega * sin(beta) / (m_n * pi) = %.2f * sin(%d) / (%.2f * %.2f) = %.3f\n', b_omega, beta, m_n_chon, pi, epsilon_beta);
 %% Tính hệ số trùng khớp ngang (epsilon_alpha)
 % Tính hệ số trùng khớp ngang epsilon_alpha
-epsilon_alpha = (1.88 - 3.2 * (1/z1_rounded + 1/z2_rounded)) * cosd(beta_ankhop);
-fprintf('  Hệ số trùng khớp ngang epsilon_alpha = [1.88 - 3.2*(1/z1 + 1/z2)]*cos(beta_ankhop) = [1.88 - 3.2*(1/%.0f + 1/%.0f)]*cos(%.2f) = %.3f\n', z1_rounded, z2_rounded, beta_ankhop, epsilon_alpha);
+epsilon_alpha = (1.88 - 3.2 * (1/z1_rounded + 1/z2_rounded)) * cosd(beta);
+fprintf('  Hệ số trùng khớp ngang epsilon_alpha = [1.88 - 3.2*(1/z1 + 1/z2)]*cos(beta) = [1.88 - 3.2*(1/%.0f + 1/%.0f)]*cos(%.2f) = %.3f\n', z1_rounded, z2_rounded, beta, epsilon_alpha);
 
 %% Tính toán hệ số xét đến sự trùng khớp của răng (Z_epsilon) cho răng nghiêng
 if epsilon_beta < 1
@@ -452,13 +456,13 @@ end
 %% 2.6.1c: Tính hệ số xét đến hình dạng bề mặt răng (Z_H)
 % Tính hệ số xét đến hình dạng bề mặt răng Z_H
 %% Tính beta_b
-beta_b = atand(cosd(alpha) * tand(beta_ankhop));
-fprintf('  beta_b = atand(cos(alpha) * tan(beta_ankhop)) = atand(cos(%d) * tan(%.2f)) = %.3f độ\n', alpha, beta_ankhop, beta_b);
+beta_b = atand(cosd(alpha) * tand(beta));
+fprintf('  beta_b = atand(cos(alpha) * tan(beta)) = atand(cos(%d) * tan(%.2f)) = %.3f độ\n', alpha, beta, beta_b);
 %% Tính alpha_wt && alpha_t
-% Tính alpha_tw = alpha_t theo công thức: alpha_tw = atand(tand(alpha) / cos(beta_ankhop))
-alpha_tw = atand(tand(alpha) / cosd(beta_ankhop));
+% Tính alpha_tw = alpha_t theo công thức: alpha_tw = atand(tand(alpha) / cos(beta))
+alpha_tw = atand(tand(alpha) / cosd(beta));
 alpha_t = alpha_tw;
-fprintf('  alpha_tw = alpha_t = atand(tan(alpha) / cos(beta_ankhop)) = atand(tan(%d) / cos(%.2f)) = %.3f độ\n', alpha, beta_ankhop, alpha_tw);
+fprintf('  alpha_tw = alpha_t = atand(tan(alpha) / cos(beta)) = atand(tan(%d) / cos(%.2f)) = %.3f độ\n', alpha, beta, alpha_tw);
 %% Tính Z_H
 % Tính Z_H theo công thức: Z_H = sqrt(2 * cos(beta_b) / sin(2 * alpha_tw))
 Z_H = sqrt(2 * cosd(beta_b) / sind(2 * alpha_tw));
@@ -661,10 +665,10 @@ Y_beta = 1 - beta_b / 140;
 fprintf('  Y_beta = 1 - beta_b / 140 = 1 - %.3f / 140 = %.3f\n', beta_b, Y_beta);
 %% 2.6.2f: Tính hệ số dạng răng (Y_F1, Y_F2)
 % Hệ số dạng răng (Y_F1, Y_F2) phụ thuộc vào số dang tương đương Z_v1 và Z_v2
-Z_v1 = z1_rounded / cosd(beta_ankhop)^3;
-fprintf('  Z_v1 = z1 / cos(beta_ankhop)^3 = %d / cos(%.2f)^3 = %.2f\n', z1_rounded, beta_ankhop, Z_v1);
-Z_v2 = z2_rounded / cosd(beta_ankhop)^3;
-fprintf('  Z_v2 = z2 / cos(beta_ankhop)^3 = %d / cos(%.2f)^3 = %.2f\n', z2_rounded, beta_ankhop, Z_v2);
+Z_v1 = z1_rounded / cosd(beta)^3;
+fprintf('  Z_v1 = z1 / cos(beta)^3 = %d / cos(%.2f)^3 = %.2f\n', z1_rounded, beta, Z_v1);
+Z_v2 = z2_rounded / cosd(beta)^3;
+fprintf('  Z_v2 = z2 / cos(beta)^3 = %d / cos(%.2f)^3 = %.2f\n', z2_rounded, beta, Z_v2);
 % Bảng số răng tương đương
 zv_bang = [12 14 16 17 20 22 25 30 40 60 80 100 150];
 % Bảng hệ số dịch chỉnh x
@@ -768,14 +772,14 @@ Ft2 = Ft1;
 fprintf('  Lực vòng Ft1 = Ft2 = 2*T1/dw1 = 2*%.1f/%.2f = %.2f N\n', T1, dw1, Ft1);
 
 %% Lực hướng tâm
-Fr1 = Ft1 * tand(20) / cosd(beta_ankhop);
+Fr1 = Ft1 * tand(20) / cosd(beta);
 Fr2 = Fr1;
-fprintf('  Lực hướng tâm Fr1 = Fr2 = Ft1 * tan(20) / cos(beta_ankhop) = %.2f * tan(20) / cos(%.2f) = %.2f N\n', Ft1, beta_ankhop, Fr1);
+fprintf('  Lực hướng tâm Fr1 = Fr2 = Ft1 * tan(20) / cos(beta) = %.2f * tan(20) / cos(%.2f) = %.2f N\n', Ft1, beta, Fr1);
 
 %% Lực dọc trục
-Fa1 = Ft1 * tand(beta_ankhop);
+Fa1 = Ft1 * tand(beta);
 Fa2 = Fa1;
-fprintf('  Lực dọc trục Fa1 = Fa2 = Ft1 * tan(beta_ankhop) = %.2f * tan(%.2f) = %.2f N\n', Ft1, beta_ankhop, Fa1);
+fprintf('  Lực dọc trục Fa1 = Fa2 = Ft1 * tan(beta) = %.2f * tan(%.2f) = %.2f N\n', Ft1, beta, Fa1);
 
 %% 2.8: Tổng kết thông số bộ truyền bánh răng
 fprintf('\n2.8: Tổng kết thông số bộ truyền bánh răng\n');
@@ -800,7 +804,7 @@ fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính đáy răng nhỏ', 'd
 fprintf('| %-25s | %-10s | %-15.2f |\n', 'Đường kính đáy răng lớn', 'df2', df2);
 fprintf('| %-25s | %-10s | %-15.2f |\n', 'Môđun pháp', 'm', m_n_chon);
 fprintf('| %-25s | %-10s | %-15.2f |\n', 'Góc profin gốc', 'alpha', alpha);
-fprintf('| %-25s | %-10s | %-15.2f |\n', 'Góc ăn khớp', 'beta', beta_ankhop);
+fprintf('| %-25s | %-10s | %-15.2f |\n', 'Góc ăn khớp', 'beta', beta);
 fprintf('| %-25s | %-10s | %-15.2f |\n', 'Chiều rộng vành đai', 'b_omega', b_omega);
 fprintf('| %-25s | %-10s | %-15.2f |\n', 'Hệ số dịch chỉnh nhỏ', 'x1', x1);
 fprintf('| %-25s | %-10s | %-15.2f |\n', 'Hệ số dịch chỉnh lớn', 'x2', x2);
