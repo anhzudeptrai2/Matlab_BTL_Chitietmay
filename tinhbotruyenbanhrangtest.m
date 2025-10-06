@@ -315,22 +315,30 @@ fprintf('  Chọn góc nghiêng của răng alpha = %d độ\n', alpha);
 
 % Tính số bánh răng chủ động
 z1 = (2 * a_w_rounded * cosd(alpha)) / (m_n_chon * (u + 1));
+% Làm tròn lên và đảm bảo số lẻ
 z1_rounded = ceil(z1);
+if mod(z1_rounded,2) == 0
+    z1_rounded = z1_rounded + 1;
+end
 fprintf('\n- Tính số bánh răng chủ động:\n');
 fprintf('  z1 = (2 * a_w * cos(alpha)) / (m_n * (u + 1)) = (2 * %d * cos(%d)) / (%.2f * (%.2f + 1)) = %.2f\n', a_w_rounded, alpha, m_n_chon, u, z1);
 if z1_rounded <= 17
     fprintf('  Số bánh răng chủ động z1 = %d nhỏ hơn 18, không hợp lệ (phải lớn hơn 17 để tránh hiện tượng ăn khớp không tốt).\n', z1_rounded);
-    z1_rounded = 18;
+    z1_rounded = 19; % chọn số lẻ lớn nhất >= 18
     fprintf('  Tự động chọn z1 = %d\n', z1_rounded);
 else
-    fprintf('  Chọn số bánh răng chủ động làm tròn: z1 = %d\n', z1_rounded);
+    fprintf('  Chọn số bánh răng chủ động làm tròn (số lẻ, làm tròn lên): z1 = %d\n', z1_rounded);
 end
 % Tính số bánh răng bị động
 z2 = z1_rounded * u;
+% Làm tròn lên và chuyển thành số lẻ
 z2_rounded = ceil(z2);
+if mod(z2_rounded,2) == 0
+    z2_rounded = z2_rounded + 1;
+end
 fprintf('\n- Tính số bánh răng bị động:\n');
 fprintf('  z2 = z1 * u = %d * %.2f = %.2f\n', z1_rounded, u, z2);
-fprintf('  Chọn số bánh răng bị động làm tròn: z2 = %d\n', z2_rounded);
+fprintf('  Chọn số bánh răng bị động làm tròn (số lẻ, làm tròn lên): z2 = %d\n', z2_rounded);
 % Tính tỉ số truyền thực tế
 u_thucte = z2_rounded / z1_rounded;
 fprintf('\n- Tỉ số truyền thực tế của bộ truyền:\n');
@@ -655,7 +663,7 @@ fprintf('  vF = delta_F * g0 * sqrt(a_w / u) = %.3f * %.0f * sqrt(%d / %.2f) = %
 % Tính hệ số kể đến tải trọng động xuất hiện trong vùng ăn khớp khi tính về uốn (K_Fv)
 K_Fv = 1 + vF * b_omega * dw1 / (2 * T1 * K_Hbeta * K_Halpha);
 fprintf('  K_Fv = 1 + vF * b_omega * dw1 / (2 * T1 * K_Hbeta * K_Halpha) = 1 + %.3f * %.2f * %.2f / (2 * %.1f * %.2f * %.2f) = %.3f\n', vF, b_omega, dw1, T1, K_Hbeta, K_Halpha, K_Fv);
-%% 2.6.2d: Tính hệ số ảnh hướng đến sự trùng khớp của răng (Y_epsilon)
+%% 2.6.2d: Tính hệ số ảnh hưởng đến sự trùng khớp của răng (Y_epsilon)
 % Tính hệ số ảnh hưởng đến sự trùng khớp của răng (Y_epsilon)
 Y_epsilon = 1 / epsilon_alpha;
 fprintf('  Y_epsilon = 1 / epsilon_alpha = 1 / %.3f = %.3f\n', epsilon_alpha, Y_epsilon);
